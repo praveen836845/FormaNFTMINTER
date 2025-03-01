@@ -42,12 +42,13 @@ const Header: React.FC<HeaderProps> = ({ walletConnected, walletAddress, onConne
                 </span>
               </div>
             ) : (
-              <button
-                onClick={onConnectWallet}
-                className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-full transition-colors"
-              >
-                Connect Wallet
-              </button>
+              // <button
+              //   onClick={onConnectWallet}
+              //   className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-full transition-colors"
+              // >
+              //   Connect Wallet
+              // </button>
+              <></>
             )}
           </nav>
 
