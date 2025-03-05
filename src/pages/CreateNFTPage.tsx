@@ -1,6 +1,17 @@
 import React, { useState } from 'react';
 import ImageGenerator from '../components/ImageGenerator';
 import { Sparkles, Save } from 'lucide-react';
+import {
+  useAccount,
+  useWriteContract,
+  useWaitForTransactionReceipt,
+  useReadContract,
+} from "wagmi";
+import { formatUnits, parseEther } from "ethers";
+import { toast } from "react-hot-toast";
+
+
+import { CONTRACT_ABI, CONTRACT_ADDRESS  } from '../contract/constant.ts'; // Import your contract ABI
 
 const CreateNFTPage: React.FC = () => {
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
@@ -11,6 +22,50 @@ const CreateNFTPage: React.FC = () => {
   });
   const [isMinting, setIsMinting] = useState(false);
   const [mintingSuccess, setMintingSuccess] = useState(false);
+  const { writeContractAsync, isPending } = useWriteContract();
+  const {address , isConnected} = useAccount()
+
+  
+  const mintNFT = async (e) => {
+    e.preventDefault();
+    console.log("Landing button clicked");
+    /* 
+     tokenURI , 
+     address , 
+     price = 0 , 
+     prompt : "Nothing"
+    */
+
+
+
+
+
+
+    try {
+      await toast.promise(
+        (async () => {
+          const amount = value.toString();
+          // Prepare contract call
+          console.log("Amount", amount);
+          const { hash } = await writeContractAsync({
+            address: CONTRACT_ADDRESS,
+            abi: CONTRACT_ABI,
+            functionName: "deposit",
+            args: ["tokenURI" , "address" , "price", "prompt"],
+            // value: amount,
+          });
+        })(),
+        {
+          loading: `Approving token ...`, // Loading state message
+          success: (hash) => `Approval successful! Transaction Hash:`, // Success state message with the hash
+          // error: (error) => `Approval failed: ${error.message}`, // Error state message
+        }
+      );
+    } catch (err) {
+      // console.log("error message" , err.message);
+      toast.error(err.message);
+    }
+  };
 
   const handleImageGenerated = (imageUrl: string, promptText: string) => {
     setGeneratedImage(imageUrl);
