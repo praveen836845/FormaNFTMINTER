@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import NFTCard from '../components/NFTCard';
 import { NFT } from '../types';
 import { Search, Filter, ArrowUpDown } from 'lucide-react';
-
+import {useGetAllNFTs} from '../services/contractcall';
+import { useAccount } from 'wagmi';
 const MarketplacePage: React.FC = () => {
   const [nfts, setNfts] = useState<NFT[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -10,6 +11,8 @@ const MarketplacePage: React.FC = () => {
   const [sortOption, setSortOption] = useState('recent');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 5]);
 
+const {address , isConnected} = useAccount();
+   const dataAllNFTs = useGetAllNFTs();
   useEffect(() => {
     // Simulate fetching NFTs from an API
     const fetchMarketplaceNFTs = async () => {

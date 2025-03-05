@@ -2,6 +2,16 @@ import React, { useState, useEffect } from 'react';
 import NFTCard from '../components/NFTCard';
 import { NFT } from '../types';
 import { Search, Filter, Grid, List } from 'lucide-react';
+import {useGetMYNFTs} from '../services/contractcall';
+import { useAccount } from 'wagmi';
+import { toast } from "react-hot-toast";
+import {
+  useWriteContract,
+  useWaitForTransactionReceipt,
+  useReadContract,
+} from "wagmi";
+import { formatUnits, parseEther } from "ethers";
+import { CONTRACT_ABI, CONTRACT_ADDRESS  } from '../contract/constant.ts'; // Import your contract ABI
 
 const GalleryPage: React.FC = () => {
   const [nfts, setNfts] = useState<NFT[]>([]);
@@ -9,6 +19,40 @@ const GalleryPage: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
+  const { address, isConnected } = useAccount();  // Destructure the needed properties
+   console.log(address);
+    const data = useGetMYNFTs(address);   // This is you data that you need do something
+    console.log("data" , data);
+
+ // Calling sellNFT to the MARKET 
+ const sellNFT = async (e) => {
+  e.preventDefault();
+  console.log("Landing button clicked");
+  try {
+    await toast.promise(
+      (async () => {
+        const amount = "1".toString() ?? 0 ;   // price
+        // Prepare contract call
+        console.log("Amount", amount);
+        const { hash } = await writeContractAsync({
+          address: CONTRACT_ADDRESS,
+          abi: CONTRACT_ABI,
+          functionName: "deposit",
+          args: ["tokenId means index of Arraylist" , ""],
+          value: amount,
+        });
+      })(),
+      {
+        loading: `Approving token ...`, // Loading state message
+        success: (hash) => `Approval successful! Transaction Hash:`, // Success state message with the hash
+        // error: (error) => `Approval failed: ${error.message}`, // Error state message
+      }
+    );
+  } catch (err) {
+    // console.log("error message" , err.message);
+    toast.error(err.message);
+  }
+};
 
   useEffect(() => {
     // Simulate fetching NFTs from an API

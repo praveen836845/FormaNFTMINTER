@@ -23,15 +23,16 @@ export const useGetAllNFTs = () => {
   };
 };
 
-export const useGetMYNFTs = () => {
+export const useGetMYNFTs = (address :any) => {
     const {data , isError , isLoading} = useReadContract({
         address: CONTRACT_ADDRESS,
     abi: CONTRACT_ABI,
+    args : [address],
     functionName: 'getMyNFTs',
     }); 
 
     return {
-        nfts: data as NFT[] | undefined,
+        nfts: data , 
         isLoading,
         isError,
     };
