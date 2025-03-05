@@ -4,25 +4,52 @@ import { Sparkles, Loader2 } from 'lucide-react';
 interface ImageGeneratorProps {
   onImageGenerated: (imageUrl: string, prompt: string) => void;
 }
+const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
+const imageGenerator = async (prompt: string) => {
+  console.log("Generating image with prompt:", prompt);
+  console.log("API Key:", API_KEY);
+  console.log("hello");
+  
+
+  try {
+    const response = await fetch('https://api.openai.com/v1/images/generations', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${API_KEY}`,
+      },
+      body: JSON.stringify({
+        prompt,
+        n: 1,
+        size: "512x512"
+      }),
+    });
+
+    if (!response.ok) throw new Error("Failed to generate image");
+
+    const data = await response.json();
+    console.log("Response Data:", data);
+
+    return data.data[0]?.url || null;  // Extracting the image URL
+  } catch (error) {
+    console.error("Error generating image:", error);
+    return null;
+  }
+};
 
 const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onImageGenerated }) => {
   const [prompt, setPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Mock function to simulate image generation
   const generateImage = async (promptText: string) => {
     setIsGenerating(true);
     setError(null);
     
     try {
-      // In a real implementation, this would call your AI image generation API
-      // For now, we'll simulate a delay and return a placeholder image
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Using Unsplash for placeholder images
-      const imageUrl = `https://source.unsplash.com/random/800x600/?${encodeURIComponent(promptText.replace(/\s+/g, ','))}`;
-      
+      const imageUrl = await imageGenerator(promptText);
+      if (!imageUrl) throw new Error("Image URL not received");
+
       onImageGenerated(imageUrl, promptText);
     } catch (err) {
       setError('Failed to generate image. Please try again.');
@@ -59,9 +86,7 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onImageGenerated }) => 
           />
         </div>
         
-        {error && (
-          <div className="text-red-500 text-sm">{error}</div>
-        )}
+        {error && <div className="text-red-500 text-sm">{error}</div>}
         
         <button
           type="submit"
