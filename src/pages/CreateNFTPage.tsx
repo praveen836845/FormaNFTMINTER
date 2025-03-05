@@ -23,12 +23,24 @@ const CreateNFTPage: React.FC = () => {
   const [isMinting, setIsMinting] = useState(false);
   const [mintingSuccess, setMintingSuccess] = useState(false);
   const { writeContractAsync, isPending } = useWriteContract();
-  const {address} = useAccount()
+  const {address , isConnected} = useAccount()
 
   
-  const handleLandingClick = async (e) => {
+  const mintNFT = async (e) => {
     e.preventDefault();
     console.log("Landing button clicked");
+    /* 
+     tokenURI , 
+     address , 
+     price = 0 , 
+     prompt : "Nothing"
+    */
+
+
+
+
+
+
     try {
       await toast.promise(
         (async () => {
@@ -39,8 +51,8 @@ const CreateNFTPage: React.FC = () => {
             address: CONTRACT_ADDRESS,
             abi: CONTRACT_ABI,
             functionName: "deposit",
-            args: ["tokenURI" , ""],
-            value: amount,
+            args: ["tokenURI" , "address" , "price", "prompt"],
+            // value: amount,
           });
         })(),
         {
@@ -55,61 +67,61 @@ const CreateNFTPage: React.FC = () => {
     }
   };
 
-  const handleImageGenerated = (imageUrl: string, promptText: string) => {
-    setGeneratedImage(imageUrl);
-    setPrompt(promptText);
+  // const handleImageGenerated = (imageUrl: string, promptText: string) => {
+  //   setGeneratedImage(imageUrl);
+  //   setPrompt(promptText);
     
-    // Suggest a name based on the prompt
-    const suggestedName = promptText
-      .split(' ')
-      .slice(0, 3)
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
+  //   // Suggest a name based on the prompt
+  //   const suggestedName = promptText
+  //     .split(' ')
+  //     .slice(0, 3)
+  //     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+  //     .join(' ');
     
-    setNftDetails({
-      name: suggestedName,
-      description: promptText,
-    });
-  };
+  //   setNftDetails({
+  //     name: suggestedName,
+  //     description: promptText,
+  //   });
+  // };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setNftDetails(prev => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  // const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  //   const { name, value } = e.target;
+  //   setNftDetails(prev => ({
+  //     ...prev,
+  //     [name]: value,
+  //   }));
+  // };
 
-  const handleMintNFT = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // const handleMintNFT = async (e: React.FormEvent) => {
+  //   e.preventDefault();
     
-    if (!generatedImage) return;
+  //   if (!generatedImage) return;
     
-    setIsMinting(true);
+  //   setIsMinting(true);
     
-    try {
-      // In a real implementation, this would call your NFT minting API
-      // For now, we'll simulate a delay
-      await new Promise(resolve => setTimeout(resolve, 3000));
+  //   try {
+  //     // In a real implementation, this would call your NFT minting API
+  //     // For now, we'll simulate a delay
+  //     await new Promise(resolve => setTimeout(resolve, 3000));
       
-      setMintingSuccess(true);
+  //     setMintingSuccess(true);
       
-      // Reset after 5 seconds
-      setTimeout(() => {
-        setMintingSuccess(false);
-        setGeneratedImage(null);
-        setPrompt('');
-        setNftDetails({
-          name: '',
-          description: '',
-        });
-      }, 5000);
-    } catch (error) {
-      console.error('Error minting NFT:', error);
-    } finally {
-      setIsMinting(false);
-    }
-  };
+  //     // Reset after 5 seconds
+  //     setTimeout(() => {
+  //       setMintingSuccess(false);
+  //       setGeneratedImage(null);
+  //       setPrompt('');
+  //       setNftDetails({
+  //         name: '',
+  //         description: '',
+  //       });
+  //     }, 5000);
+  //   } catch (error) {
+  //     console.error('Error minting NFT:', error);
+  //   } finally {
+  //     setIsMinting(false);
+  //   }
+  // };
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">

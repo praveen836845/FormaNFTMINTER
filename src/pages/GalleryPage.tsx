@@ -24,6 +24,7 @@ const GalleryPage: React.FC = () => {
     const data = useGetMYNFTs(address);   // This is you data that you need do something
     console.log("data" , data);
 
+  const { writeContractAsync, isPending } = useWriteContract();
  // Calling sellNFT to the MARKET 
  const sellNFT = async (e) => {
   e.preventDefault();
@@ -39,7 +40,6 @@ const GalleryPage: React.FC = () => {
           abi: CONTRACT_ABI,
           functionName: "deposit",
           args: ["tokenId means index of Arraylist" , ""],
-          value: amount,
         });
       })(),
       {
@@ -49,8 +49,8 @@ const GalleryPage: React.FC = () => {
       }
     );
   } catch (err) {
-    // console.log("error message" , err.message);
-    toast.error(err.message);
+    console.log("error message" , err);
+    
   }
 };
 
