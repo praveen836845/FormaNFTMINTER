@@ -4,6 +4,14 @@ import { NFT } from '../types';
 import { Search, Filter, ArrowUpDown } from 'lucide-react';
 import {useGetAllNFTs} from '../services/contractcall';
 import { useAccount } from 'wagmi';
+import { parseEther } from 'ethers';
+import {
+  useWriteContract,
+  useWaitForTransactionReceipt,
+  useReadContract,
+} from "wagmi";
+import { CONTRACT_ABI, CONTRACT_ADDRESS  } from '../contract/constant.ts'; // Import your contract ABI
+
 const MarketplacePage: React.FC = () => {
   const [nfts, setNfts] = useState<NFT[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -13,6 +21,52 @@ const MarketplacePage: React.FC = () => {
 
 const {address , isConnected} = useAccount();
    const dataAllNFTs = useGetAllNFTs();
+
+   const { writeContractAsync, isPending } = useWriteContract();
+
+
+
+  // Calling the contract 
+  const buyNFT = async (nft: NFT) => {
+    try {
+      const priceInEth = nft.price;
+      const amountInWei = parseEther(priceInEth); // Convert ETH to Wei
+  
+      await toast.promise(
+        (async () => {
+          const { hash } = await writeContractAsync({
+            address: CONTRACT_ADDRESS,
+            abi: CONTRACT_ABI,
+            functionName: "buyNFT", // Make sure this matches your contract function name
+            args: [nft.id],
+            value: amountInWei // This is how you send ETH with the transaction
+          });
+          
+          return hash;
+        })(),
+        {
+          loading: 'Processing purchase...',
+          success: (hash) => `Purchase successful! Transaction Hash: ${hash}`,
+          error: (error) => `Purchase failed: ${error.message}`
+        }
+      );
+    } catch (err) {
+      console.error("Purchase error:", err);
+    }
+  };
+
+
+
+
+
+
+
+
+
+
+
+
+
   useEffect(() => {
     // Simulate fetching NFTs from an API
     const fetchMarketplaceNFTs = async () => {
