@@ -37,6 +37,33 @@ const imageGenerator = async (prompt: string) => {
   }
 };
 
+const uploadToIPFS = async (file: File) => {
+  const jwt = import.meta.env.VITE_PINATE_JWT;
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await fetch("https://api.pinata.cloud/pinning/pinFileToIPFS", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+      body: formData,
+    });
+
+    const data = await response.json();
+    console.log("Data:", data);
+    if (data.IpfsHash) {
+      return `https://ipfs.io/ipfs/${data.IpfsHash}`;
+    } else {
+      throw new Error("IPFS upload failed");
+    }
+  } catch (error) {
+    console.error("Error uploading to IPFS:", error);
+    return null;
+  }
+}
+
 const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onImageGenerated }) => {
   const [prompt, setPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
